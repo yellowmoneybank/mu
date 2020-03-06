@@ -137,6 +137,24 @@ Also see `mu4e-context-policy'."
   :safe 'symbolp
   :group 'mu4e-compose)
 
+(defcustom mu4e-compose-crypto-policy nil
+  "Policy to control when messages will be signed/encrypted."
+  :type '(set (const sign-all-messages :tag "Sign all messages")
+              (const encrypt-all-messages :tag "Encrypt all messages")
+              (const sign-new-messages :tag "Sign new messages")
+              (const encrypt-new-messages :tag "Encrypt new messages")
+              (const sign-forwarded-messages :tag "Sign forwarded messages")
+              (const encrypt-forwarded-messages :tag "Encrypt forwarded messages")
+              (const sign-edited-messages :tag "Sign edited messages")
+              (const edited-forwarded-messages :tag "Encrypt edited messages")
+              (const sign-all-replies :tag "Sign all replies")
+              (const encrypt-all-replies :tag "Encrypt all replies")
+              (const sign-plain-replies :tag "Sign replies to plain messages")
+              (const encrypt-plain-replies :tag "Encrypt replies to plain messages")
+              (const sign-encrypted-replies :tag "Sign replies to encrypted messages")
+              (const encrypt-encrypted-replies :tag "Encrypt replies to encrypted messages"))
+  :group 'mu4e-compose)
+
 (defcustom mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
   "Policy for signing/encrypting replies to encrypted messages.
 We have the following choices:
