@@ -584,6 +584,107 @@ buffers; lets remap its faces so it uses the ones for mu4e."
                                               nil nil t)
                     (buffer-name)))))
 
+(defun mu4e~compose-crypto-message (parent compose-type)
+  "This function inspects the options set in `mu4e-compose-crypto-policy' and signs/encrypts the message accordingly."
+  (let ((encrypt nil)
+        (sign nil))
+    (progn
+      ;; policies for all messages
+      (when
+          (memq 'sign-all-messages mu4e-compose-crypto-policy)
+        (setq sign t))
+
+      (when
+          (memq 'encrypt-all-messages mu4e-compose-crypto-policy)
+        (setq encrypt t))
+
+
+      ;; new messages
+      (when
+          (and
+           (eq compose-type 'new)
+           (memq 'sign-new-messages mu4e-compose-crypto-policy))
+        (setq sign t))
+
+      (when
+          (and
+           (eq compose-type 'new)
+           (memq 'encrypt-new-messages mu4e-compose-crypto-policy))
+        (setq encrypt t))
+
+
+      ;; forwarded messages
+      (when
+          (and
+           (eq compose-type 'forward)
+           (memq 'sign-forwarded-messages mu4e-compose-crypto-policy))
+        (setq sign t))
+
+      (when
+          (and (eq compose-type 'forward)
+               (memq 'encrypt-forwarded-messages mu4e-compose-crypto-policy))
+        (setq encrypt t))
+
+
+      ;; edited messages
+      (when
+          (and
+           (eq compose-type 'edit)
+           (memq 'sign-edited-messages mu4e-compose-crypto-policy))
+        (setq sign t))
+
+      (when
+          (and
+           (eq compose-type 'edit)
+           (memq 'encrypt-edited-messages mu4e-compose-crypto-policy))
+        (setq encrypt t))
+
+
+      ;; replies
+      (when
+          (and
+           (eq compose-type 'reply)
+           (memq 'sign-all-replies mu4e-compose-crypto-policy))
+        (setq sign t))
+
+      (when
+          (and
+           (eq compose-type 'reply)
+           (memq 'encrypt-all-replies mu4e-compose-crypto-policy))
+        (setq encrypt t))
+
+
+      ;; plain replies
+      (when
+          (and (eq compose-type 'reply)
+               (not (and parent (member 'encrypted (mu4e-message-field parent :flags))))
+               (memq 'sign-plain-replies mu4e-compose-crypto-policy))
+        (setq sign t))
+      (when
+          (and (eq compose-type 'reply)
+               (not (and parent (member 'encrypted (mu4e-message-field parent :flags))))
+               (memq 'encrypt-plain-replies mu4e-compose-crypto-policy))
+        (setq encrypt t))
+      ;; encrypted replies
+      (when
+          (and (eq compose-type 'reply)
+               (and parent (member 'encrypted (mu4e-message-field parent :flags)))
+               (memq 'sign-encrypted-replies mu4e-compose-crypto-policy))
+        (setq sign t))
+      (when
+          (and (eq compose-type 'reply)
+               (and parent (member 'encrypted (mu4e-message-field parent :flags)))
+               (memq 'encrypt-encrypted-replies mu4e-compose-crypto-policy))
+        (setq encrypt t))
+
+      ;; encrypt/sign message
+      (cond
+       ((and sign (not encrypt) (sign (mml-secure-message-sign))))
+       ((and (not sign) encrypt) (encrypt (mml-secure-message-encrypt)))
+       ((and sign encrypt) (sign-and-encrypt (mml-secure-message-sign-encrypt)))
+       (t (message "Do nothing"))))))
+
+
 (defun mu4e~compose-crypto-reply (parent compose-type)
   "Possibly encrypt or sign a message based on PARENT and COMPOSE-TYPE.
 When composing a reply to an encrypted message, we can
@@ -646,7 +747,11 @@ tempfile)."
   ;; headers and body. will be removed before saving to disk
   (mu4e~draft-insert-mail-header-separator)
   ;; maybe encrypt/sign replies
-  (mu4e~compose-crypto-reply original-msg compose-type)
+  (if
+      (or mu4e-compose-crypto-reply-encrypted-policy mu4e-compose-crypto-reply-plain-policy)
+      (mu4e~compose-crypto-reply original-msg compose-type)
+    (mu4e~compose-crypto-message original-msg compose-type))
+
   ;; include files -- e.g. when inline forwarding a message with
   ;; attachments, we take those from the original.
   (save-excursion
