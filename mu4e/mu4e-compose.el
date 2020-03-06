@@ -171,6 +171,11 @@ We have the following choices:
   :safe 'symbolp
   :group 'mu4e-compose)
 
+(make-obsolete-variable 'mu4e-compose-crypto-reply-encrypted-policy "The use of the
+ 'mu4e-compose-crypto-reply-encrypted-policy' variable is deprecated.
+ 'mu4e-compose-crypto-policy' should be used instead"
+                        "2020-03-06")
+
 (defcustom mu4e-compose-crypto-reply-plain-policy nil
   "Policy for signing/encrypting replies to messages received unencrypted.
 We have the following choices:
@@ -186,6 +191,11 @@ We have the following choices:
           (const :tag "Don't do anything" nil))
   :safe 'symbolp
   :group 'mu4e-compose)
+
+(make-obsolete-variable 'mu4e-compose-crypto-reply-plain-policy "The use of the
+ 'mu4e-compose-crypto-reply-plain-policy' variable is deprecated.
+ 'mu4e-compose-crypto-policy' should be used instead"
+                        "2020-03-06")
 
 (make-obsolete-variable 'mu4e-compose-crypto-reply-policy "The use of the
  'mu4e-compose-crypto-reply-policy' variable is deprecated.
