@@ -137,7 +137,8 @@ Also see `mu4e-context-policy'."
   :safe 'symbolp
   :group 'mu4e-compose)
 
-(defcustom mu4e-compose-crypto-policy nil
+(defcustom mu4e-compose-crypto-policy
+  '(encrypt-encrypted-replies sign-encrypted-replies)
   "Policy to control when messages will be signed/encrypted.
 
 The value is a list, whose members determine the behaviour of
@@ -178,7 +179,7 @@ All `sign-*' options have a `encrypt-*' analogue."
               (const :tag "Encrypt replies to encrypted messages" encrypt-encrypted-replies))
   :group 'mu4e-compose)
 
-(defcustom mu4e-compose-crypto-reply-encrypted-policy 'sign-and-encrypt
+(defcustom mu4e-compose-crypto-reply-encrypted-policy nil
   "Policy for signing/encrypting replies to encrypted messages.
 We have the following choices:
 
