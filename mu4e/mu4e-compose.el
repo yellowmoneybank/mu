@@ -138,7 +138,30 @@ Also see `mu4e-context-policy'."
   :group 'mu4e-compose)
 
 (defcustom mu4e-compose-crypto-policy nil
-  "Policy to control when messages will be signed/encrypted."
+  "Policy to control when messages will be signed/encrypted.
+
+The value is a list, whose members determine the behaviour of
+`mu4e~compose-crypto-message'. Specifically, it might contain:
+
+- `sign-all-messages': Always add a signature.
+- `sign-new-messages': Add a signature to new message, ie.
+  messages that aren't responses to another message.
+- `sign-forwarded-messages': Add a signature when forwarding
+  a message
+- `sign-edited-messages': Add a signature to drafts
+- `sign-all-replies': Add a signature when responding to
+  another message.
+- `sign-plain-replies': Add a signature when responding to
+  non-encrypted messages.
+- `sign-encrypted-replies': Add a signature when responding
+  to encrypted messages.
+
+It should be noted that certain symbols have priorities over one
+another. So `sign-all-messages' implies `sign-all-replies', which
+in turn implies `sign-plain-replies'. Adding both to the set, is
+not a contradiction, but a redundant configuration.
+
+All `sign-*' options have a `encrypt-*' analogue."
   :type '(set (const sign-all-messages :tag "Sign all messages")
               (const encrypt-all-messages :tag "Encrypt all messages")
               (const sign-new-messages :tag "Sign new messages")
