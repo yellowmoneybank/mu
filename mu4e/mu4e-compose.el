@@ -702,10 +702,21 @@ tempfile)."
   ;; insert mail-header-separator, which is needed by message mode to separate
   ;; headers and body. will be removed before saving to disk
   (mu4e~draft-insert-mail-header-separator)
+
   ;; maybe encrypt/sign replies
-  (if
-      (or mu4e-compose-crypto-reply-encrypted-policy mu4e-compose-crypto-reply-plain-policy)
-      (mu4e~compose-crypto-reply original-msg compose-type)
+  (let ((mu4e-compose-crypto-policy
+         (append
+          (cl-case mu4e-compose-crypto-reply-encrypted-policy
+            (sign '(sign-encrypted-replies))
+            (encrypt '(encrypt-encrypted-replies))
+            (sign-and-encrypt
+             '(sign-encrypted-replies encrypt-encrypted-replies)))
+          (cl-case mu4e-compose-crypto-reply-plain-policy
+            (sign '(sign-plain-replies))
+            (encrypt '(encrypt-plain-replies))
+            (sign-and-encrypt
+             '(sign-plain-replies encrypt-plain-replies)))
+          mu4e-compose-crypto-policy)))
     (mu4e~compose-crypto-message original-msg compose-type))
 
   ;; include files -- e.g. when inline forwarding a message with
