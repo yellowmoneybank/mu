@@ -611,51 +611,48 @@ buffers; lets remap its faces so it uses the ones for mu4e."
 (defun mu4e~compose-crypto-message (parent compose-type)
   "Possibly encrypt or sign a message based on PARENT and COMPOSE-TYPE.
 See `mu4e-compose-crypto-policy' for more details."
-  (let* ((encrypted-p (memq 'encrypted (mu4e-message-field parent :flags)))
+  (let* ((encrypted-p
+          (and parent (memq 'encrypted (mu4e-message-field parent :flags))))
          (encrypt
-         (or (memq 'encrypt-all-messages mu4e-compose-crypto-policy)
-             ;; new messages
-             (and (memq 'encrypt-new-messages mu4e-compose-crypto-policy)
-                  (eq compose-type 'new))
-             ;; forwarded messages
-             (and (eq compose-type 'forward)
-                  (memq 'encrypt-forwarded-messages mu4e-compose-crypto-policy))
-             ;; edited messages
-             (and (eq compose-type 'edit)
-                  (memq 'encrypt-edited-messages mu4e-compose-crypto-policy))
-             ;; all replies
-             (and (eq compose-type 'reply)
-                  (memq 'encrypt-all-replies mu4e-compose-crypto-policy))
-             ;; plain replies
-             (and (eq compose-type 'reply)
-                  (not (and parent encrypted-p))
-                  (memq 'encrypt-plain-replies mu4e-compose-crypto-policy))
-             ;; encrypted replies
-             (and (eq compose-type 'reply)
-                  (and parent encrypted-p)
-                  (memq 'encrypt-encrypted-replies mu4e-compose-crypto-policy))))
-        (sign
-         (or (memq 'sign-all-messages mu4e-compose-crypto-policy)
-             ;; new messages
-             (and (eq compose-type 'new)
-                  (memq 'sign-new-messages mu4e-compose-crypto-policy))
-             ;; forwarded messages
-             (and (eq compose-type 'forward)
-                  (memq 'sign-forwarded-messages mu4e-compose-crypto-policy))
-             ;; edited messages
-             (and (eq compose-type 'edit)
-                  (memq 'sign-edited-messages mu4e-compose-crypto-policy))
-             ;; all replies
-             (and (eq compose-type 'reply)
-                  (memq 'sign-all-replies mu4e-compose-crypto-policy))
-             ;; plain replies
-             (and (eq compose-type 'reply)
-                  (not (and parent encrypted-p))
-                  (memq 'sign-plain-replies mu4e-compose-crypto-policy))
-             ;; encrypted replies
-             (and (eq compose-type 'reply)
-                  (and parent encrypted-p)
-                  (memq 'sign-encrypted-replies mu4e-compose-crypto-policy)))))
+          (or (memq 'encrypt-all-messages mu4e-compose-crypto-policy)
+              ;; new messages
+              (and (memq 'encrypt-new-messages mu4e-compose-crypto-policy)
+                   (eq compose-type 'new))
+              ;; forwarded messages
+              (and (eq compose-type 'forward)
+                   (memq 'encrypt-forwarded-messages mu4e-compose-crypto-policy))
+              ;; edited messages
+              (and (eq compose-type 'edit)
+                   (memq 'encrypt-edited-messages mu4e-compose-crypto-policy))
+              ;; all replies
+              (and (eq compose-type 'reply)
+                   (memq 'encrypt-all-replies mu4e-compose-crypto-policy))
+              ;; plain replies
+              (and (eq compose-type 'reply) (not encrypted-p)
+                   (memq 'encrypt-plain-replies mu4e-compose-crypto-policy))
+              ;; encrypted replies
+              (and (eq compose-type 'reply) (not encrypted-p)
+                   (memq 'encrypt-encrypted-replies mu4e-compose-crypto-policy))))
+         (sign
+          (or (memq 'sign-all-messages mu4e-compose-crypto-policy)
+              ;; new messages
+              (and (eq compose-type 'new)
+                   (memq 'sign-new-messages mu4e-compose-crypto-policy))
+              ;; forwarded messages
+              (and (eq compose-type 'forward)
+                   (memq 'sign-forwarded-messages mu4e-compose-crypto-policy))
+              ;; edited messages
+              (and (eq compose-type 'edit)
+                   (memq 'sign-edited-messages mu4e-compose-crypto-policy))
+              ;; all replies
+              (and (eq compose-type 'reply)
+                   (memq 'sign-all-replies mu4e-compose-crypto-policy))
+              ;; plain replies
+              (and (eq compose-type 'reply) encrypted-p
+                   (memq 'sign-plain-replies mu4e-compose-crypto-policy))
+              ;; encrypted replies
+              (and (eq compose-type 'reply) encrypted-p
+                   (memq 'sign-encrypted-replies mu4e-compose-crypto-policy)))))
     (cond ((and sign encrypt)
            (mml-secure-message-sign-encrypt))
           (sign (mml-secure-message-sign))
