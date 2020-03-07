@@ -608,7 +608,7 @@ buffers; lets remap its faces so it uses the ones for mu4e."
                                               nil nil t)
                     (buffer-name)))))
 
-(defun mu4e~compose-crypto-message (parent compose-type)
+(defun mu4e-compose-crypto-message (parent compose-type)
   "Possibly encrypt or sign a message based on PARENT and COMPOSE-TYPE.
 See `mu4e-compose-crypto-policy' for more details."
   (let* ((encrypted-p
@@ -715,7 +715,7 @@ tempfile)."
             (sign-and-encrypt
              '(sign-plain-replies encrypt-plain-replies)))
           mu4e-compose-crypto-policy)))
-    (mu4e~compose-crypto-message original-msg compose-type))
+    (mu4e-compose-crypto-message original-msg compose-type))
 
   ;; include files -- e.g. when inline forwarding a message with
   ;; attachments, we take those from the original.
